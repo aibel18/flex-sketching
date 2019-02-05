@@ -11,8 +11,3 @@
 # /demo/compiler/vc14win64/* 
 # /extensions/compiler/vc14win64/* 
 /doc/*
-/bin/*/
-
-!bin/win64/SDL2.dll
-!bin/win64/Leap.dll
-!bin/win64/openvr_api.dll
