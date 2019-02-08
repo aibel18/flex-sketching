@@ -291,6 +291,9 @@ public:
 	GpuMesh* meshToolRight;
 	GpuMesh* meshToolLeft;
 
+	int numberParticlesLeft = 0;
+	int numberParticlesRight = 0;
+
 	ContainerModel container;
 
 	/// function that create type brushes
@@ -369,6 +372,8 @@ public:
 				std::cout << "Hand: Number of particles Hand LEFT: " << size << std::endl;
 			}
 		}
+
+		this->numberParticlesLeft = g_buffers->positions.size();
 		
 		if( isRightHand ){
 			if(this->toolRight.bindHand( rightHand, vrcontrol, &container)){
@@ -403,6 +408,7 @@ public:
 		}
 		this->numberHand = this->idObjects;
 
+		this->numberParticlesRight = g_buffers->positions.size();
 		g_numSolidParticles = g_buffers->positions.size();
 	}
 
@@ -474,7 +480,7 @@ public:
 					g_buffers->positions[k][1] = v.y;
 					g_buffers->positions[k][2] = v.z;
 
-					g_buffers->velocities[k] = Vec3(0.0f);
+					//g_buffers->velocities[k] = Vec3(0.0f);
 				}
 			}
 			/// update form brush because event joysstick
@@ -493,7 +499,7 @@ public:
 					g_buffers->positions[k][1] = v.y;
 					g_buffers->positions[k][2] = v.z;
 
-					g_buffers->velocities[k] = Vec3(0.0f);
+					//g_buffers->velocities[k] = Vec3(0.0f);
 				}
 			}
 			/// update form brush because event joysstick
@@ -567,7 +573,7 @@ public:
 		}
 		/// draw future particles
 		if (this->container.activeParticles > 0 ) {
-			drawPoints(this->container.idVBO, this->container.indicesVBO, this->container.numberNewparticles, 0, radius*0.98f, float(g_screenWidth), aspect, fov, g_lightPos, g_lightTarget, lightTransform, g_shadowMap);
+			drawPoints(this->container.idVBO, this->container.indicesVBO, this->container.numberNewparticles, 0, radius, float(g_screenWidth), aspect, fov, g_lightPos, g_lightTarget, lightTransform, g_shadowMap);
 		}
 	}
 	
@@ -907,7 +913,8 @@ public:
 		if (!this->toolRight.handModel || !this->toolRight.handModel->unable)
 			return;
 	}
-
+	int idObjectSelect = -1;
+	std::vector<Vec3> posObjectSelect;
 	void collistionTool() {
 
 		int* neighbors = (int*)NvFlexMap(neighborsBuffer, 0);
@@ -917,45 +924,80 @@ public:
 
 
 		int stride = g_buffers->activeIndices.size();
-		bool isCollition = false;
+		bool isCollitionLeft = false;
+		bool isCollitionRight = false;
 
 		int phaseObject = 0;
-		for (int i = 0; i < g_numSolidParticles; ++i)
-		{
-			// find offset in the neighbors buffer
-			int offset = apiToInternal[i];
-			int count = counts[offset];
 
-			Vec3 posTem(g_buffers->positions[i]);
-			for (int c = 0; c < count; ++c)
+		if (!this->toolLeft.isGrasp && !this->toolRight.isGrasp) {
+			/// collision for hand left
+			for (int i = 0; i < this->numberParticlesLeft; ++i)
 			{
-				int neighbor = internalToApi[neighbors[c*stride + offset]];
+				// find offset in the neighbors buffer
+				int offset = apiToInternal[i];
+				int count = counts[offset];
 
-				if ( neighbor >= g_numSolidParticles ) {
-				float res = Distance(posTem, Vec3(g_buffers->positions[neighbor]));
-					if(res < this->container.radius ){
-						isCollition = true;
-						phaseObject = g_buffers->phases[neighbor];
-						break;
-					}
+				Vec3 posTem(g_buffers->positions[i]);
+				for (int c = 0; c < count; ++c)
+				{
+					int neighbor = internalToApi[neighbors[c*stride + offset]];
+
+					if ( neighbor >= g_numSolidParticles ) {
+					float res = Distance(posTem, Vec3(g_buffers->positions[neighbor]));
+						if(res < this->container.radius ){
+							isCollitionLeft = true;
+							phaseObject = g_buffers->phases[neighbor];
+							break;
+						}
 					
+					}
+				}
+				if ( isCollitionLeft ) {
+					break;
 				}
 			}
-			if ( isCollition ) {
-				break;
+			/// collision for hand right
+			for (int i = this->numberParticlesLeft; i < this->numberParticlesRight; ++i)
+			{
+				// find offset in the neighbors buffer
+				int offset = apiToInternal[i];
+				int count = counts[offset];
+
+				Vec3 posTem(g_buffers->positions[i]);
+				for (int c = 0; c < count; ++c)
+				{
+					int neighbor = internalToApi[neighbors[c*stride + offset]];
+
+					if (neighbor >= g_numSolidParticles) {
+						float res = Distance(posTem, Vec3(g_buffers->positions[neighbor]));
+						if (res < this->container.radius) {
+							isCollitionRight = true;
+							phaseObject = g_buffers->phases[neighbor];
+							break;
+						}
+
+					}
+				}
+				if (isCollitionRight) {
+					break;
+				}
 			}
 		}
-
-		if ( isCollition ) {
-
-			/// update select object
-			if (this->toolLeft.isGrasp || this->toolRight.isGrasp) {
-				int idObject = getIdObject(phaseObject) - this->numberHand;				
-				this->selectObject( idObject );
-			}
-
-			vrcontrol->haptic();
+		else if (idObjectSelect >= 0) {
+			/*if (!(phaseObject & eNvFlexPhaseFluid))
+				this->selectObject(idObjectSelect);*/
 		}
+
+		if ( (isCollitionLeft || isCollitionRight) && idObjectSelect < 0) {
+			//idObjectSelect = getIdObject(phaseObject) - this->numberHand;
+			vrcontrol->haptic(isCollitionLeft, isCollitionRight);
+		}
+		/*
+		else if (idObjectSelect>=0 && !this->toolLeft.isGrasp && !this->toolRight.isGrasp ) {
+			this->DeselectObject(idObjectSelect);
+			idObjectSelect = -1;			
+		}
+		*/
 		///Interaction
 		NvFlexUnmap(neighborsBuffer);
 		NvFlexUnmap(countsBuffer);
@@ -966,27 +1008,69 @@ public:
 	void selectObject(int idObject) {
 		std::cout << "Id object " << idObject << std::endl;
 
-		int numParticlesSelect = this->objects[idObject].particles - this->objects[idObject].particlesOffset;
+		//int numParticlesSelect = this->objects[idObject].particles - this->objects[idObject].particlesOffset;
 
 		//std::cout << this->objects[idObject].particlesOffset << " " << this->objects[ idObject ].particles << std::endl;
 
-		int particlesActives = NvFlexGetActiveCount(g_solver);
+		std::vector<int> indexSelect;
 
-		/*std::vector<Vec3> ps;
-		std::vector<int> is;
+		Matrix44 m(this->toolRight.matrixTool);
 
 		for (int i = this->objects[idObject].particlesOffset,k=0; i < this->objects[idObject].particles; i++, k++) {
-			ps.push_back(Vec3(g_buffers->positions[i]));
-			is.push_back(k);			
-		}*/
-
-		/*g_buffers->activeIndices.resize(particlesActives - numParticlesSelect);
-		for (int i=0;i< this->objects[idObject].particlesOffset;i++) {
-			g_buffers->activeIndices.push_back(i);
+			//indexSelect.push_back(i);
+			g_buffers->positions[i].w = 0.0f;		// increase picked particle's mass to force it towards the point
+			
+			g_buffers->positions[i] = m * g_buffers->positions[i];
+			g_buffers->velocities[i] = Vec3(0.0f);		// increase picked particle's mass to force it towards the point
 		}
-		for (int i = this->objects[idObject].particles; i < particlesActives; i++) {
-			g_buffers->activeIndices.push_back(i);
-		}*/
+	}
+	void DeselectObject(int idObject) {
+
+		for (int i = this->objects[idObject].particlesOffset, k = 0; i < this->objects[idObject].particles; i++, k++) {
+			g_buffers->positions[i].w = 1.0f;		// increase picked particle's mass to force it towards the point
+			//g_buffers->velocities[i] = Vec3(0.0f);		// increase picked particle's mass to force it towards the point
+		}
+	}
+	void selectParticles(std::vector<int> *particlesSel) {
+
+		// mouse went down, pick new particle
+		if (g_mousePicked)
+		{
+			assert(g_mouseParticle == -1);
+
+			Vec3 origin, dir;
+			GetViewRay(g_lastx, g_screenHeight - g_lasty, origin, dir);
+
+			const int numActive = NvFlexGetActiveCount(g_solver);
+
+			g_mouseParticle = PickParticle(origin, dir, &g_buffers->positions[0], &g_buffers->phases[0], numActive, g_params.radius*0.8f, g_mouseT);
+
+			if (g_mouseParticle != -1)
+			{
+				printf("picked: %d, mass: %f v: %f %f %f\n", g_mouseParticle, g_buffers->positions[g_mouseParticle].w, g_buffers->velocities[g_mouseParticle].x, g_buffers->velocities[g_mouseParticle].y, g_buffers->velocities[g_mouseParticle].z);
+
+				g_mousePos = origin + dir * g_mouseT;
+				g_mouseMass = g_buffers->positions[g_mouseParticle].w;
+				g_buffers->positions[g_mouseParticle].w = 0.0f;		// increase picked particle's mass to force it towards the point
+			}
+
+			g_mousePicked = false;
+		}
+
+		// update picked particle position
+		if (g_mouseParticle != -1)
+		{
+			Vec3 p = Lerp(Vec3(g_buffers->positions[g_mouseParticle]), g_mousePos, 0.8f);
+			Vec3 delta = p - Vec3(g_buffers->positions[g_mouseParticle]);
+
+			g_buffers->positions[g_mouseParticle].x = p.x;
+			g_buffers->positions[g_mouseParticle].y = p.y;
+			g_buffers->positions[g_mouseParticle].z = p.z;
+
+			g_buffers->velocities[g_mouseParticle].x = delta.x / g_dt;
+			g_buffers->velocities[g_mouseParticle].y = delta.y / g_dt;
+			g_buffers->velocities[g_mouseParticle].z = delta.z / g_dt;
+		}
 	}
 };
 

@@ -19,7 +19,6 @@ Global
 		{FD4C9C06-7BEC-CDF8-C631-CD32A428A280}.debug|x64.ActiveCfg = debug|x64
 		{FD4C9C06-7BEC-CDF8-C631-CD32A428A280}.debug|x64.Build.0 = debug|x64
 		{FD4C9C06-7BEC-CDF8-C631-CD32A428A280}.release|x64.ActiveCfg = release|x64
-		{FD4C9C06-7BEC-CDF8-C631-CD32A428A280}.release|x64.Build.0 = release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

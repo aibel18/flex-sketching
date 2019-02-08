@@ -6,14 +6,19 @@ public:
 
 
 	~Interaction() {
-		//destroyDrawPoints(&this->idContainerVBO, &this->indicesContainerVBO);
+		destroyDrawPoints(&this->idContainerVBO, &this->indicesContainerVBO);
 		tool.destroy();
 	}
 	/// Interaction
 	ModelingTool tool;
 	//float centerContainer[3] = { 0.0f,-4.25f, 10.0f };
-	//float centerContainer[3] = { 0.0f,2.25f, 0.0f };
-	float centerContainer[3] = { 0.0f,-2.0f, 0.0f };
+	float centerContainer[3] = { 0.0f,0.0f, 0.0f };
+	//float centerContainer[3] = { 0.0f,-2.0f, 0.0f };
+
+	float radius = 0.25;//0.1875f;// 0.1f;
+	float restDistanceFluid = radius * 0.65f;//0.55f;
+	float restDistanceSolid = radius * 0.5f;//0.55f;
+	
 	void Initialize()
 	{		
 		float scale = 10.0f;//15.0f;
@@ -30,25 +35,21 @@ public:
 		// no fluids or sdf based collision
 		//g_solverDesc.featureMode = eNvFlexFeatureModeSimpleSolids;
 
-		float radius = 0.1875f;// 0.1f;
-		float restDistanceFluid = radius * 0.7f;//0.55f;
-		float restDistanceSolid = radius * 0.65f;//0.55f;
-
 		g_sceneLower = Vec3(0.0f);
 		
 
-		g_numSubsteps = 2;
+		g_numSubsteps = 4;
 
 		g_params.radius = radius;
 		g_params.fluidRestDistance = restDistanceFluid;
 		g_params.solidRestDistance = restDistanceSolid;
 		g_params.numIterations = 4;
-		g_params.viscosity = 1.0f;
-		g_params.dynamicFriction = 0.5f;
+		g_params.viscosity = 0.1f;
+		g_params.dynamicFriction = 0.2f;
 		g_params.staticFriction = 0.0f;
-		g_params.particleCollisionMargin = g_params.fluidRestDistance*0.5f;
+		//g_params.particleCollisionMargin = g_params.fluidRestDistance*0.5f;
 		g_params.collisionDistance = g_params.fluidRestDistance*0.5f;
-		g_params.vorticityConfinement = 120.0f;//40.0f;
+		g_params.vorticityConfinement = 40.0f;//40.0f;
 		g_params.cohesion = 0.0025f;
 		g_params.drag = 0.06f;
 		g_params.lift = 0.f;
@@ -63,12 +64,16 @@ public:
 		g_params.surfaceTension = 0.0f;
 
 		// limit velocity to CFL condition
-		g_params.maxSpeed = restDistanceFluid*g_numSubsteps / g_dt;
+		g_params.maxSpeed = restDistanceFluid*g_numSubsteps / g_dt*10.0f;
+		//g_params.damping = 0.25f;
+		g_params.maxAcceleration = 400.0f;
 
 		
-		g_params.solidPressure = 0.f;		
+		g_params.solidPressure = 0.f;
+		
+		int numberParticles = 150 * 1024; //128 * 1024 * 2;//5;
 
-		g_maxDiffuseParticles = 128 * 1024 * 2;//5;
+		g_maxDiffuseParticles = numberParticles;
 		g_diffuseScale = 0.25f;
 		g_diffuseShadow = false;
 		g_diffuseColor = 2.5f;
@@ -78,7 +83,7 @@ public:
 
 		g_fluidColor = Vec4(0.113f, 0.425f, 0.55f, 1.f);		
 
-		g_numExtraParticles = 128 * 1024 * 1; //128 * 1024 * 5;
+		g_numExtraParticles = numberParticles;
 
 		g_lightDistance = 20.0f;
 
@@ -99,7 +104,7 @@ public:
 		this->tool.start(true, true, false, false);
 		this->tool.init(g_params.fluidRestDistance, centerContainer);
 		
-		//InitParticlesContainer();
+		InitParticlesContainer();
 
 		
 	}
@@ -113,9 +118,9 @@ public:
 
 		g_camAngle = Vec3(-DegToRad(90.0f), -DegToRad(15.0f), 0.0f);
 		//*/
-		g_camPos.x = 0.0f + centerContainer[0];
-		g_camPos.y = 4.0f ;//+ centerContainer[1];
-		g_camPos.z = 0.0f + centerContainer[2];//15.0f;
+		g_camPos.x = 5.0f + centerContainer[0];
+		g_camPos.y = 20.0f ;//+ centerContainer[1];
+		g_camPos.z = 35.0f + centerContainer[2];//15.0f;
 		g_camAngle = Vec3(0.0f, -DegToRad(15.0f), 0.0f);
 		//*/
 	}
@@ -158,7 +163,7 @@ public:
 
 		//DrawSystemCoordinate(radius, 300.0f);
 
-		this->tool.draw(radius, aspect, fov, lightTransform);
+		this->tool.draw(this->restDistanceSolid*0.5, aspect, fov, lightTransform);
 
 		//drawPoints(this->idContainerVBO, this->indicesContainerVBO, this->numParticlesContainer, 0, radius*0.90f, float(g_screenWidth), aspect, fov, g_lightPos, g_lightTarget, lightTransform, g_shadowMap);
 	}

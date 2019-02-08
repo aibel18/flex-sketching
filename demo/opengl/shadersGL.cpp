@@ -3368,14 +3368,19 @@ void DrawGpuMesh2(GpuMesh* m, const Matrix44& xform, const Vec4& color)
 {
 	if (m)
 	{
+		//glEnable(GL_BLEND);
+		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 		GLint program;
 		glGetIntegerv(GL_CURRENT_PROGRAM, &program);
 
 		if (program)
 			glUniformMatrix4fv(glGetUniformLocation(program, "objectTransform"), 1, false, xform);
 
+		
+		//glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 		glVerify(glColor4fv(color));
-		//glVerify(glSecondaryColor4fv(color));
+		//glVerify(glSecondaryColorv(color));
 		//glVerify(glColor4fv(color));
 
 
@@ -3399,6 +3404,7 @@ void DrawGpuMesh2(GpuMesh* m, const Matrix44& xform, const Vec4& color)
 
 		if (program)
 			glUniformMatrix4fv(glGetUniformLocation(program, "objectTransform"), 1, false, Matrix44::kIdentity);
+		//glDisable(GL_BLEND);
 	}
 }
 

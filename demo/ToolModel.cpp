@@ -236,17 +236,7 @@ void ToolModel::eventController(vr::VREvent_t event) {
 			}
 			break;
 
-		/*case vr::k_EButton_ApplicationMenu:
-			switch (event.eventType) {
-			case vr::VREvent_ButtonPress:
-
-				break;
-
-			case vr::VREvent_ButtonUnpress:
-				break;
-			}
-			break;*/
-		case vr::k_EButton_A:
+		case vr::k_EButton_ApplicationMenu:
 			switch (event.eventType) {
 			case vr::VREvent_ButtonPress:
 				this->isEmitter = false;
@@ -263,6 +253,8 @@ void ToolModel::eventController(vr::VREvent_t event) {
 				break;
 			}
 			break;
+		//case vr::k_EButton_A:
+			
 		default: {
 			//std::cout << "OTRO" << event.data.controller.button << std::endl;
 		}
@@ -323,7 +315,7 @@ bool ToolModel::update() {
 	/// update matrix for brush
 	multiple4xTranslation(this->matrixBrush, this->matrixTool, this->emitter.positionIni);
 
-	/// update position emitter
+	/// update position emitterwebview-panel:webview-panel/webview-0
 	this->emitter.position.x = this->matrixBrush[12];
 	this->emitter.position.y = this->matrixBrush[13];
 	this->emitter.position.z = this->matrixBrush[14];
@@ -364,7 +356,7 @@ void ToolModel::refuseParticles() {
 
 void ToolModel::interpolationVelocity(std::vector<vec3> *list) {
 
-	int top = MyRound( this->emitter.speed  / this->container->radius * 0.5f);
+	int top = MyRound( this->emitter.speed  / this->container->radius * 0.125f);
 
 	std::vector<vec3> particlesShapeBrush;
 	(*this->brushes[this->emitter.formBrush])(this->container->radius, this->emitter.width, &particlesShapeBrush);

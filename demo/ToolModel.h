@@ -268,7 +268,7 @@ struct ContainerModel{
 
 struct EmitterModel
 {
-	EmitterModel() : speed(0.0f), positionIni(0.0f), width(3), formBrush(0), typeMaterial(2) {}
+	EmitterModel() : speed(0.0f), positionIni(0.0f), width(3), formBrush(0), typeMaterial(0) {}
 
 	vec3 position;
 	//vec3 direction;

@@ -178,22 +178,22 @@ bool g_shapesChanged = false;
 /* Note that this array of colors is altered by demo code, and is also read from global by graphics API impls */
 Colour g_colors[] =
 {
-	Colour(0.0f, 0.5f, 1.0f),
 	Colour(0.797f, 0.354f, 0.000f),
 	Colour(0.092f, 0.465f, 0.820f),
 	Colour(0.000f, 0.349f, 0.173f),
 	Colour(0.875f, 0.782f, 0.051f),
 	Colour(0.000f, 0.170f, 0.453f),
 	Colour(0.673f, 0.111f, 0.000f),
-	Colour(0.612f, 0.194f, 0.394f)
+	Colour(0.612f, 0.194f, 0.394f),
+	Colour(0.0f, 0.5f, 1.0f)
 };
 
 /// Interaction
 Colour myColors[] =
 {
-	Colour(0.673f, 0.111f, 0.000f,0.2f),
-	Colour(0.797f, 0.354f, 0.000f,0.2f),
-	Colour(0.092f, 0.465f, 0.820f,0.2f),
+	Colour(0.673f, 0.111f, 0.000f,0.1f),
+	Colour(0.797f, 0.354f, 0.000f,0.1f),
+	Colour(0.092f, 0.465f, 0.820f,0.1f),
 
 	Colour(236.0f / 255, 239.0f / 255, 241.0f / 255/*, 0.8f*/),
 	
@@ -1425,9 +1425,9 @@ void RenderScene()
 
 	Matrix44 proj = ProjectionMatrix(RadToDeg(fov), aspect, g_camNear, g_camFar);
 	Matrix44 view;
-	if( vrcontrol->isHMD )
+	/*if( vrcontrol->isHMD )
 		view = Matrix44(vrcontrol->mHMDEye);
-	else
+	else*/
 		view = RotationMatrix(-g_camAngle.x, Vec3(0.0f, 1.0f, 0.0f))*RotationMatrix(-g_camAngle.y, Vec3(cosf(-g_camAngle.x), 0.0f, sinf(-g_camAngle.x)))*TranslationMatrix(-Point3(g_camPos));
 
 	

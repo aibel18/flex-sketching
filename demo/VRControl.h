@@ -94,7 +94,7 @@ public:
 	virtual bool setupHMD( void(*createFrame) (FrameBuffer *fb, int w, int h), void(*destroyFrame) (FrameBuffer *fb), void(*drawFrame) (FrameBuffer *fb, int w, int h));
 	virtual void renderHMD();
 
-	virtual void haptic();
+	virtual void haptic(bool, bool);
 
 	void(*managerEvent)(vr::VREvent_t event);
 };
@@ -113,7 +113,7 @@ public:
 	virtual void runProcedure();
 	virtual bool setupHMD(void(*createFrame) (FrameBuffer *fb, int w, int h), void(*destroyFrame) (FrameBuffer *fb), void(*drawFrame) (FrameBuffer *fb, int w, int h));
 	virtual void renderHMD();
-	virtual void haptic();
+	virtual void haptic(bool, bool);
 		
 private:
 

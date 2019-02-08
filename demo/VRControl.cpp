@@ -79,7 +79,7 @@ bool VRControl::setupHMD( void(*createFrame)(FrameBuffer *fb, int w, int h), voi
 void VRControl::renderHMD() {	
 }
 
-void VRControl::haptic() {
+void VRControl::haptic(bool, bool) {
 }
 
 
@@ -276,21 +276,20 @@ void OpenControl::findDevice() {
 	}
 }
 
+
 void OpenControl::findAxis(int typeHand) {
-	for (int x = 0; x < vr::k_unControllerStateAxisCount; x++){
+	for (int x = 0; x < vr::k_unControllerStateAxisCount; x++) {
 
 		int prop = vrSystem->GetInt32TrackedDeviceProperty(this->hand[typeHand].deviceID,
 			(vr::ETrackedDeviceProperty)(vr::Prop_Axis0Type_Int32 + x));
 
 		if (prop == vr::k_eControllerAxis_Trigger) {
-			prop -= 2;
 			printf("TRIGER %d: %d\n", prop, x);
-			this->con[typeHand].indexTrigger = prop;
+			this->con[typeHand].indexTrigger = x;
 		}
 		else if (prop == vr::k_eControllerAxis_TrackPad || prop == vr::k_eControllerAxis_Joystick) {
-			prop -= 2;
 			printf("JOYSTICK %d: %d \n", prop, x);
-			this->con[typeHand].indexJoystick = prop;
+			this->con[typeHand].indexJoystick = x;
 		}
 		else {
 			//printf("otro %d: %d \n", prop, x);
@@ -369,13 +368,11 @@ void OpenControl::trackingHand(int typeHand) {
 	/// fin get the coor the hands ///		
 }
 
-void OpenControl::haptic() {
-	this->vrSystem->TriggerHapticPulse(this->hand[rightHand].deviceID, 0, 200);
-	//this->vrSystem->TriggerHapticPulse(this->hand[rightHand].deviceID, 1, 100);
-	//this->vrSystem->TriggerHapticPulse(this->hand[rightHand].deviceID, 2, 100);
-
-	//vr::VRInput()->TriggerHapticVibrationAction(m_rHand[Left].m_actionHaptic, 0, 1, 4.f, 1.0f, vr::k_ulInvalidInputValueHandle);
-
+void OpenControl::haptic(bool pulseLeft, bool pulseRight) {
+	if(pulseLeft)
+		this->vrSystem->TriggerHapticPulse(this->hand[leftHand].deviceID, 0, 200);
+	if (pulseRight)
+		this->vrSystem->TriggerHapticPulse(this->hand[rightHand].deviceID, 0, 200);
 }
 
 void OpenControl::renderHMD() {
