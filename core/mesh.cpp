@@ -91,6 +91,32 @@ void Mesh::CalculateNormals()
 		m_normals[i] = ::Normalize(m_normals[i]);
 }
 
+void Mesh::CalculateNormalsInv()
+{
+	m_normals.resize(0);
+	m_normals.resize(m_positions.size());
+
+	int numTris = int(GetNumFaces());
+
+	for (int i = 0; i < numTris; ++i)
+	{
+		int a = m_indices[i * 3 + 0];
+		int b = m_indices[i * 3 + 1];
+		int c = m_indices[i * 3 + 2];
+
+		Vec3 n = -Cross( m_positions[b] - m_positions[c], m_positions[a] - m_positions[c]);
+
+		m_normals[a] += n;
+		m_normals[b] += n;
+		m_normals[c] += n;
+	}
+
+	int numVertices = int(GetNumVertices());
+
+	for (int i = 0; i < numVertices; ++i)
+		m_normals[i] = ::Normalize(m_normals[i]);
+}
+
 namespace 
 {
 

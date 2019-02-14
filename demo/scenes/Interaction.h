@@ -15,7 +15,7 @@ public:
 	float centerContainer[3] = { 0.0f,0.0f, 0.0f };
 	//float centerContainer[3] = { 0.0f,-2.0f, 0.0f };
 
-	float radius = 0.25;//0.1875f;// 0.1f;
+	float radius = 0.1875f;// 0.1f;
 	float restDistanceFluid = radius * 0.65f;//0.55f;
 	float restDistanceSolid = radius * 0.5f;//0.55f;
 	
@@ -45,8 +45,8 @@ public:
 		g_params.solidRestDistance = restDistanceSolid;
 		g_params.numIterations = 4;
 		g_params.viscosity = 0.1f;
-		g_params.dynamicFriction = 0.2f;
-		g_params.staticFriction = 0.0f;
+		g_params.dynamicFriction = 0.7f;
+		g_params.staticFriction = 0.4f;
 		//g_params.particleCollisionMargin = g_params.fluidRestDistance*0.5f;
 		g_params.collisionDistance = g_params.fluidRestDistance*0.5f;
 		g_params.vorticityConfinement = 40.0f;//40.0f;
@@ -101,7 +101,7 @@ public:
 		this->numParticlesContainer = (DIM - 1) * 4;
 
 
-		this->tool.start(true, true, false, false);
+		this->tool.start(false, true, false, false);
 		this->tool.init(g_params.fluidRestDistance, centerContainer);
 		
 		InitParticlesContainer();
@@ -118,10 +118,10 @@ public:
 
 		g_camAngle = Vec3(-DegToRad(90.0f), -DegToRad(15.0f), 0.0f);
 		//*/
-		g_camPos.x = 5.0f + centerContainer[0];
-		g_camPos.y = 20.0f ;//+ centerContainer[1];
-		g_camPos.z = 35.0f + centerContainer[2];//15.0f;
-		g_camAngle = Vec3(0.0f, -DegToRad(15.0f), 0.0f);
+		g_camPos.x = 0;//5.0f + centerContainer[0];
+		g_camPos.y = 13.0f ;//+ centerContainer[1];
+		g_camPos.z = 22.0f + centerContainer[2];//15.0f;
+		g_camAngle = Vec3(0.0f, -DegToRad(20.0f), 0.0f);
 		//*/
 	}
 
@@ -163,9 +163,9 @@ public:
 
 		//DrawSystemCoordinate(radius, 300.0f);
 
-		this->tool.draw(this->restDistanceSolid*0.5, aspect, fov, lightTransform);
+		this->tool.draw(this->restDistanceSolid*0.75f, aspect, fov, lightTransform);
 
-		//drawPoints(this->idContainerVBO, this->indicesContainerVBO, this->numParticlesContainer, 0, radius*0.90f, float(g_screenWidth), aspect, fov, g_lightPos, g_lightTarget, lightTransform, g_shadowMap);
+		drawPoints(this->idContainerVBO, this->indicesContainerVBO, this->numParticlesContainer, 0, radius*0.90f, float(g_screenWidth), aspect, fov, g_lightPos, g_lightTarget, lightTransform, g_shadowMap);
 	}
 
 

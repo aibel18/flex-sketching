@@ -324,6 +324,8 @@ bool ToolModel::update() {
 	this->emitter.velocity.init(this->handModel->velocity.normalize());
 	this->emitter.speed = this->handModel->velocity.magnitude();
 
+	
+
 	return true;
 }
 

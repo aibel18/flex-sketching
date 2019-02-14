@@ -1367,8 +1367,8 @@ void DrawPlanes(Vec4* planes, int n, float bias)
 
 	GLint uBias = glGetUniformLocation(s_diffuseProgram, "bias");
 	glVerify(glUniform1f(uBias, 0.0f));
-	GLint uGrid = glGetUniformLocation(s_diffuseProgram, "grid");
-	glVerify(glUniform1i(uGrid, 1));
+	//GLint uGrid = glGetUniformLocation(s_diffuseProgram, "grid");
+	//glVerify(glUniform1i(uGrid, 1));
 	GLint uExpand = glGetUniformLocation(s_diffuseProgram, "expand");
 	glVerify(glUniform1f(uExpand, 0.0f));
 
@@ -1380,7 +1380,7 @@ void DrawPlanes(Vec4* planes, int n, float bias)
 		DrawPlane(p, false);
 	}
 
-	glVerify(glUniform1i(uGrid, 0));
+	//glVerify(glUniform1i(uGrid, 0));
 	glVerify(glUniform1f(uBias, g_shadowBias));
 }
 

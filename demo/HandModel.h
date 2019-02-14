@@ -46,6 +46,10 @@ struct vec3 {
 		vec3 v(this->x + v2.x, this->y + v2.y, this->z + v2.z);
 		return v;
 	}
+	vec3 operator- (vec3 v2) {
+		vec3 v(this->x - v2.x, this->y - v2.y, this->z - v2.z);
+		return v;
+	}
 	vec3 operator* (float val) {
 		vec3 v(this->x * val, this->y * val, this->z * val);
 		return v;

@@ -13,9 +13,13 @@
 #include "VRControl.h"
 #include <vector>
 
-constexpr int DIM_X = 151;
-constexpr int DIM_Y = 151;
-constexpr int DIM_Z = 151;
+constexpr int DIM_X = 171;
+constexpr int DIM_Y = 171;
+constexpr int DIM_Z = 171;
+
+constexpr int DIM_X_R = DIM_X + 1;
+constexpr int DIM_Y_R = DIM_Y + 1;
+constexpr int DIM_Z_R = DIM_Z + 1;
 
 constexpr int PERCEPT_PARTICLES = 20;
 
@@ -28,9 +32,11 @@ struct ContainerModel{
 	int indicesResult[SIZE_PARTICLES];
 
 	int matrixIndex[DIM_X][DIM_Y][DIM_Z];
+	int matrixIndexRender[DIM_X_R][DIM_Y_R][DIM_Z_R];
 
 	const float dimensionMatrix[3] = {DIM_X, DIM_Y, DIM_Z};
 	const int centerMatrix[3] = {DIM_X/2, 0, DIM_Z / 2};
+	const int centerMatrixc[3] = { DIM_X / 2, DIM_Y / 2, DIM_Z / 2 };
 
 	/// buffer adjacentes
 	int indexAdjacent[SIZE_PARTICLES];
@@ -71,6 +77,14 @@ struct ContainerModel{
 			for (int y = 0; y < DIM_Y; ++y) {
 				for (int z = 0; z < DIM_Z; ++z) {
 					this->matrixIndex[x][y][z] = -1;
+				}
+			}
+		}
+		/// init index of matrix
+		for (int x = 0; x < DIM_X_R; ++x) {
+			for (int y = 0; y < DIM_Y_R; ++y) {
+				for (int z = 0; z < DIM_Z_R; ++z) {
+					this->matrixIndexRender[x][y][z] = -1;
 				}
 			}
 		}
@@ -150,6 +164,41 @@ struct ContainerModel{
 			return true;
 		}
 		return false;
+	}
+	bool verifyPositionRender(int x, int y, int z) {
+		if (x >= DIM_X_R || y >= DIM_Y_R || z >= DIM_Z_R || x < 0 || y < 0 || z < 0) {
+			//std::cout << "OVERFLOW" << std::endl;
+			return false;
+		}
+		return true;
+	}
+	bool isEmptyRender(int x, int y, int z) {
+		if (this->matrixIndexRender[x][y][z] < 0) {
+			return true;
+		}
+		return false;
+	}
+	bool verifyCorner(int x, int y , int z) {
+
+		if (this->verifyPosition(x, y, z) && !this->isEmpty(x, y, z)) {
+			
+			return true;
+		}
+		return false;
+	}
+	bool verifyCellRender(int x, int y, int z) {
+
+		if (this->verifyPositionRender(x, y, z) && this->isEmptyRender(x, y, z)) {
+			this->matrixIndexRender[x][y][z] = 1;
+			return true;
+		}
+		return false;
+	}
+	void reiniceCellRender(int x, int y, int z) {
+
+		if (this->verifyPositionRender(x, y, z) ){
+			this->matrixIndexRender[x][y][z] = -1;
+		}
 	}
 	void verifyNeignbor(int p[3]) {
 		/// front 
@@ -294,7 +343,7 @@ struct EmitterModel
 ------------------------------------------------------------------------------------
 */
 /// Maximun Val
-constexpr int WidthMax = 7;
+constexpr int WidthMax = 13;
 constexpr int FormBrushMax = 6;
 constexpr int TypeMaterialMax = 4;
 

@@ -42,6 +42,7 @@ struct Mesh
 	void DuplicateVertex(uint32_t i);
 
     void CalculateNormals();
+		void CalculateNormalsInv();
     void Transform(const Matrix44& m);
 	void Normalize(float s=1.0f);	// scale so bounds in any dimension equals s and lower bound = (0,0,0)
 
