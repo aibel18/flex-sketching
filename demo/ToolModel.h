@@ -13,17 +13,17 @@
 #include "VRControl.h"
 #include <vector>
 
-constexpr int DIM_X = 171;
-constexpr int DIM_Y = 171;
-constexpr int DIM_Z = 171;
+constexpr int DIM_X = 151;
+constexpr int DIM_Y = 151;
+constexpr int DIM_Z = 151;
 
 constexpr int DIM_X_R = DIM_X + 1;
 constexpr int DIM_Y_R = DIM_Y + 1;
 constexpr int DIM_Z_R = DIM_Z + 1;
 
-constexpr int PERCEPT_PARTICLES = 20;
+constexpr int PERCEPT_PARTICLES = 10;
 
-constexpr int SIZE_PARTICLES = DIM_X * DIM_Y * DIM_Z / PERCEPT_PARTICLES;
+constexpr int SIZE_PARTICLES = DIM_X * DIM_Y * DIM_Z * PERCEPT_PARTICLES / 100;
 
 struct ContainerModel{
 
@@ -343,7 +343,7 @@ struct EmitterModel
 ------------------------------------------------------------------------------------
 */
 /// Maximun Val
-constexpr int WidthMax = 13;
+constexpr int WidthMax = 61;
 constexpr int FormBrushMax = 6;
 constexpr int TypeMaterialMax = 4;
 

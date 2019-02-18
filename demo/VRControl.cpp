@@ -165,6 +165,7 @@ bool OpenControl::setupHMD(void(*createFrame) (FrameBuffer *fb,int w, int h), vo
 		this->mFrameCenter[id] = this->frameRight.matrixEye[id];
 	}
 	this->mFrameCenter[12] = 0.0f;
+	this->mFrameCenter[14] = this->mFrameCenter[14] - 0.3f;
 	
 
 	//std::cout << "System VR: SETUP CAMERA \n";

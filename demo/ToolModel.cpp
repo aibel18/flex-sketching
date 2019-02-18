@@ -358,7 +358,7 @@ void ToolModel::refuseParticles() {
 
 void ToolModel::interpolationVelocity(std::vector<vec3> *list) {
 
-	int top = MyRound( this->emitter.speed  / this->container->radius * 0.125f);
+	int top = MyRound( this->emitter.speed  / this->container->radius * 0.0625f);
 
 	std::vector<vec3> particlesShapeBrush;
 	(*this->brushes[this->emitter.formBrush])(this->container->radius, this->emitter.width, &particlesShapeBrush);

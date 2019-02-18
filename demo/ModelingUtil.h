@@ -1,4 +1,4 @@
-static const int DIM = 171;
+static const int DIM = 151;
 
 Vec4 calculateCenterMass(const Vec4* positions, int posIni, int posFin) {
 	Vec4 center;

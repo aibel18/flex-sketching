@@ -426,9 +426,9 @@ namespace OGL_Renderer
 			{
 				if (cmd.rect.r == 0)
 				{
-					drawRect((float)cmd.rect.x*s + 0.5f, (float)cmd.rect.y*s + 0.5f,
+					/*drawRect((float)cmd.rect.x*s + 0.5f, (float)cmd.rect.y*s + 0.5f,
 						(float)cmd.rect.w*s - 1, (float)cmd.rect.h*s - 1,
-						1.0f, cmd.col);
+						1.0f, cmd.col);*/
 				}
 				else
 				{

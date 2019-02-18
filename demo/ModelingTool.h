@@ -989,7 +989,7 @@ public:
 				this->container.rebuild();
 				updatePoints(this->container.idVBO, this->container.indicesVBO, (float*)&this->container.particlesResult[0], &this->container.indicesResult[0], this->container.numberNewparticles);
 
-				std::cout << "EMITIENDO\n";
+				//std::cout << "EMITIENDO\n";
 			}
 
 
@@ -1093,7 +1093,7 @@ public:
 				renderingInstance.particlesOffset = particlesActives;
 				renderingInstance.particles = renderingInstance.particlesOffset + this->container.numberNewparticles;				
 
-				g_buffers->rigidCoefficients.push_back(1.0f);
+				g_buffers->rigidCoefficients.push_back(0.9f);
 				g_buffers->rigidTranslations.push_back(Vec3(center[0], center[1], center[2]));
 				g_buffers->rigidRotations.push_back(Quat());
 
@@ -1119,7 +1119,7 @@ public:
 				Instance instance;
 				instance.mClusterSpacing = 1.5f;
 				instance.mClusterRadius = 0.0f;
-				instance.mClusterStiffness = 0.5f;
+				instance.mClusterStiffness = 0.75f;
 				
 				this->CreateSoftBody(instance, particlesActives);
 				std::cout << "CREATE SOFT\n";
@@ -1386,6 +1386,12 @@ public:
 	}
 	int idObjectSelect = -1;
 	std::vector<Vec3> posObjectSelect;
+
+	std::vector<int> particlesSelectedLeft;
+	std::vector<int> particlesSelectedRight;
+	int particleToolLeft;
+	int particleToolRight;
+
 	void collistionTool() {
 
 		int* neighbors = (int*)NvFlexMap(neighborsBuffer, 0);
@@ -1400,7 +1406,17 @@ public:
 
 		int phaseObject = 0;
 
+		if (this->toolLeft.isGrasp && particlesSelectedLeft.size() > 0) {
+			selectParticles(&particlesSelectedLeft, Vec3(g_buffers->positions[particleToolLeft]));
+		}
+		if (this->toolRight.isGrasp && particlesSelectedRight.size() > 0) {
+			selectParticles(&particlesSelectedRight, Vec3(g_buffers->positions[particleToolRight]));
+		}
+		
+
 		if (!this->toolLeft.isGrasp && !this->toolRight.isGrasp) {
+			particlesSelectedLeft.clear();
+			particlesSelectedRight.clear();
 			/// collision for hand left
 			for (int i = 0; i < this->numberParticlesLeft; ++i)
 			{
@@ -1414,16 +1430,17 @@ public:
 					int neighbor = internalToApi[neighbors[c*stride + offset]];
 
 					if ( neighbor >= g_numSolidParticles ) {
-					float res = Distance(posTem, Vec3(g_buffers->positions[neighbor]));
+						float res = Distance(posTem, Vec3(g_buffers->positions[neighbor]));
 						if(res < this->container.radius ){
 							isCollitionLeft = true;
 							phaseObject = g_buffers->phases[neighbor];
-							break;
-						}
-					
+							particlesSelectedLeft.push_back(neighbor);
+							//break;
+						}					
 					}
 				}
 				if ( isCollitionLeft ) {
+					particleToolLeft = i;
 					break;
 				}
 			}
@@ -1444,20 +1461,21 @@ public:
 						if (res < this->container.radius) {
 							isCollitionRight = true;
 							phaseObject = g_buffers->phases[neighbor];
-							break;
+							particlesSelectedRight.push_back(neighbor);
 						}
 
 					}
 				}
 				if (isCollitionRight) {
+					particleToolRight = i;
 					break;
 				}
 			}
 		}
-		else if (idObjectSelect >= 0) {
-			/*if (!(phaseObject & eNvFlexPhaseFluid))
-				this->selectObject(idObjectSelect);*/
-		}
+		/*else if (idObjectSelect >= 0) {
+			if (!(phaseObject & eNvFlexPhaseFluid))
+				this->selectObject(idObjectSelect);
+		}*/
 
 		if ( (isCollitionLeft || isCollitionRight) && idObjectSelect < 0) {
 			//idObjectSelect = getIdObject(phaseObject) - this->numberHand;
@@ -1502,45 +1520,23 @@ public:
 			//g_buffers->velocities[i] = Vec3(0.0f);		// increase picked particle's mass to force it towards the point
 		}
 	}
-	void selectParticles(std::vector<int> *particlesSel) {
+	void selectParticles(std::vector<int> *particlesSel, Vec3 positionTool) {
 
-		// mouse went down, pick new particle
-		if (g_mousePicked)
-		{
-			assert(g_mouseParticle == -1);
+		for ( int i=0;i< particlesSel->size();i++) {
 
-			Vec3 origin, dir;
-			GetViewRay(g_lastx, g_screenHeight - g_lasty, origin, dir);
+			int indexParticle = (*particlesSel)[i];
+			
+			Vec3 p = Lerp(Vec3(g_buffers->positions[indexParticle]), positionTool, 1.0f);
+			Vec3 delta = p - Vec3(g_buffers->positions[indexParticle]);
 
-			const int numActive = NvFlexGetActiveCount(g_solver);
+			g_buffers->positions[indexParticle].x = p.x;
+			g_buffers->positions[indexParticle].y = p.y;
+			g_buffers->positions[indexParticle].z = p.z;
 
-			g_mouseParticle = PickParticle(origin, dir, &g_buffers->positions[0], &g_buffers->phases[0], numActive, g_params.radius*0.8f, g_mouseT);
+			g_buffers->velocities[indexParticle].x = delta.x / g_dt;
+			g_buffers->velocities[indexParticle].y = delta.y / g_dt;
+			g_buffers->velocities[indexParticle].z = delta.z / g_dt;
 
-			if (g_mouseParticle != -1)
-			{
-				printf("picked: %d, mass: %f v: %f %f %f\n", g_mouseParticle, g_buffers->positions[g_mouseParticle].w, g_buffers->velocities[g_mouseParticle].x, g_buffers->velocities[g_mouseParticle].y, g_buffers->velocities[g_mouseParticle].z);
-
-				g_mousePos = origin + dir * g_mouseT;
-				g_mouseMass = g_buffers->positions[g_mouseParticle].w;
-				g_buffers->positions[g_mouseParticle].w = 0.0f;		// increase picked particle's mass to force it towards the point
-			}
-
-			g_mousePicked = false;
-		}
-
-		// update picked particle position
-		if (g_mouseParticle != -1)
-		{
-			Vec3 p = Lerp(Vec3(g_buffers->positions[g_mouseParticle]), g_mousePos, 0.8f);
-			Vec3 delta = p - Vec3(g_buffers->positions[g_mouseParticle]);
-
-			g_buffers->positions[g_mouseParticle].x = p.x;
-			g_buffers->positions[g_mouseParticle].y = p.y;
-			g_buffers->positions[g_mouseParticle].z = p.z;
-
-			g_buffers->velocities[g_mouseParticle].x = delta.x / g_dt;
-			g_buffers->velocities[g_mouseParticle].y = delta.y / g_dt;
-			g_buffers->velocities[g_mouseParticle].z = delta.z / g_dt;
 		}
 	}
 };
