@@ -388,12 +388,15 @@ public:
 	ToolModel();
 	~ToolModel();
 
-	bool bindHand(TypeHand type,VRControl *vrcontrol, ContainerModel *container);
-	void init(bool emitter = true);
+	bool bindHand(TypeHand type,VRControl *vrcontrol, ContainerModel *container,int particleIndex, bool isHand);
+	void initEmitter(bool emitter = true);
 	
 
 	void eventControllerJoystick();
 	void eventController(vr::VREvent_t event);
+
+	void eventKeyDown(int key);
+	void eventKeyUp(int key);
 
 	/// update position tool
 	bool update();

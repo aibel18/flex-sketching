@@ -80,6 +80,7 @@ void VRControl::renderHMD() {
 }
 
 void VRControl::haptic(bool, bool) {
+	//std::cout<< "no haptic feedback\n";
 }
 
 

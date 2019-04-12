@@ -490,9 +490,9 @@ void marchCube(ContainerModel* container, Mesh* m, vec3 minCornerPos, float* cen
 			float s1 = 0.0f;
 			float s2 = 0.0f;
 
-			if( container->verifyCorner(vert1.x, vert1.y, vert1.z) )
+			if( container->verifyCorner((int)vert1.x, (int)vert1.y, (int)vert1.z) )
 				s1 = 1;
-			if (container->verifyCorner(vert2.x, vert2.y, vert2.z) )
+			if (container->verifyCorner((int)vert2.x, (int)vert2.y, (int)vert2.z) )
 				s2 = 1;
 
 			// interpolate along the edge
@@ -806,89 +806,59 @@ public:
 		int phaseSolid = NvFlexMakePhase(this->idObjects, 0);
 
 		if( isLeftHand ){
-			if( this->toolLeft.bindHand( leftHand, vrcontrol, &container) ){
-
-				/// create particles for tool Left
-				if (this->toolLeft.numberParticles) {
-					this->toolLeft.offsetParticles = g_buffers->positions.size();
-					for (int i = 0; i < this->toolLeft.numberParticles; i++) {
-						g_buffers->positions.push_back(Vec4(0, 0, 0, 0));
-						g_buffers->velocities.push_back(Vec3(0, 0, 0));
-						g_buffers->phases.push_back(phaseSolid);
-					}
-					//this->idObjects++;
-					//phaseSolid = NvFlexMakePhase(this->idObjects, 0);
-				}
-
-				vrcontrol->bindHand(leftHand, g_buffers->positions.size(),isParticleHandLeft);
-
-				int size = vrcontrol->sizeParticlesHand(leftHand);				
-				for (int i = 0; i < size; i++) {
-					g_buffers->positions.push_back(Vec4(0, 0, 0, 0));
-					g_buffers->velocities.push_back(Vec3(0, 0, 0));
-					g_buffers->phases.push_back(phaseSolid);
-				}
-				//if (size > 0) {
-					this->idObjects++;
-					phaseSolid = NvFlexMakePhase(this->idObjects, 0);
-				//}
-				std::cout << "Hand: Number of particles Hand LEFT: " << size << std::endl;
+			
+			this->toolLeft.bindHand( leftHand, vrcontrol, &container, g_buffers->positions.size(), isParticleHandLeft);
+			for (int i = 0; i < this->toolLeft.handModel->sizeParticlesHand; i++) {
+				g_buffers->positions.push_back(Vec4(0, 0, 0, 0));
+				g_buffers->velocities.push_back(Vec3(0, 0, 0));
+				g_buffers->phases.push_back(phaseSolid);
 			}
+			for (int i = 0; i < this->toolLeft.numberParticles; i++) {
+				g_buffers->positions.push_back(Vec4(0, 0, 0, 0));
+				g_buffers->velocities.push_back(Vec3(0, 0, 0));
+				g_buffers->phases.push_back(phaseSolid);
+			}
+			this->idObjects++;
+			phaseSolid = NvFlexMakePhase(this->idObjects, 0);
 		}
 
 		this->numberParticlesLeft = g_buffers->positions.size();
 		
 		if( isRightHand ){
-			if(this->toolRight.bindHand( rightHand, vrcontrol, &container)){
+			this->toolRight.bindHand( rightHand, vrcontrol, &container, g_buffers->positions.size(), isParticleHandRight);
 
-				/// create particles for tool Right
-				if (this->toolRight.numberParticles) {
-					this->toolRight.offsetParticles = g_buffers->positions.size();
-					for (int i = 0; i < this->toolRight.numberParticles; i++) {
-						g_buffers->positions.push_back(Vec4(0, 0, 0, 0));
-						g_buffers->velocities.push_back(Vec3(0, 0, 0));
-						g_buffers->phases.push_back(phaseSolid);
-					}
-					//this->idObjects++;
-					//phaseSolid = NvFlexMakePhase(this->idObjects, 0);
-				}
-
-				vrcontrol->bindHand(rightHand, g_buffers->positions.size(), isParticleHandRight);
-
-				int size = vrcontrol->sizeParticlesHand(rightHand);
-				
-				for (int i = 0; i < size; i++) {
-					g_buffers->positions.push_back(Vec4(0, 0, 0, 0));
-					g_buffers->velocities.push_back(Vec3(0, 0, 0));
-					g_buffers->phases.push_back(phaseSolid);
-				}
-				//if (size > 0) {
-					this->idObjects++;
-					//phaseSolid = NvFlexMakePhase(this->idObjects, 0);
-				//}
-				std::cout << "Hand: Number of particles Hand RIGHT: " << size << std::endl;
+			for (int i = 0; i < this->toolRight.handModel->sizeParticlesHand; i++) {
+				g_buffers->positions.push_back(Vec4(0, 0, 0, 0));
+				g_buffers->velocities.push_back(Vec3(0, 0, 0));
+				g_buffers->phases.push_back(phaseSolid);
 			}
+			for (int i = 0; i < this->toolRight.numberParticles; i++) {
+				g_buffers->positions.push_back(Vec4(0, 0, 0, 0));
+				g_buffers->velocities.push_back(Vec3(0, 0, 0));
+				g_buffers->phases.push_back(phaseSolid);
+			}
+			this->idObjects++;
 		}
 		this->numberHand = this->idObjects;
-
+		
 		this->numberParticlesRight = g_buffers->positions.size();
 		g_numSolidParticles = g_buffers->positions.size();
 	}
 
-	void init(float radius, float center[3]) {
+	void initEmitter(float radius, float center[3], bool isLeft, bool isRight) {
 
 		this->container.init(radius, center);
 		initDrawPoints(&this->container.idVBO, &this->container.indicesVBO, SIZE_PARTICLES);
 
-		if (this->toolLeft.container) {
-			this->toolLeft.init();
+		if (this->toolLeft.container && isLeft ) {
+			this->toolLeft.initEmitter();
 			this->loadMeshTool(1,radius);
 
 			(*this->tranformation[this->toolLeft.emitter.formBrush])(&this->meshBrushLeft, radius, this->toolLeft.emitter.width);
 			std::cout << "VRControl : INIT TOOL LEFT" << std::endl;
 		}
-		if (this->toolRight.container) {
-			this->toolRight.init();
+		if (this->toolRight.container && isRight) {
+			this->toolRight.initEmitter();
 			this->loadMeshTool(2,radius);
 
 			(*this->tranformation[this->toolRight.emitter.formBrush])(&this->meshBrushRight, radius, this->toolRight.emitter.width);
@@ -1024,19 +994,20 @@ public:
 			
 		}
 		
-
-		if ( this->toolLeft.toolEmitter ) {
-			/// draw mesh tool
+		if ( this->toolLeft.numberParticles ) {
+			/// draw mesh tool left
 			DrawGpuMesh(this->meshToolLeft, Matrix44(this->toolLeft.matrixTool), Vec3(myColors[5]));
-			/// draw mesh brush
+		}		
+		if ( this->toolRight.numberParticles) {
+			/// draw mesh tool right
+			DrawGpuMesh(this->meshToolRight, Matrix44(this->toolRight.matrixTool), Vec3(myColors[5]));
+		}
+		if (this->toolLeft.toolEmitter) {
+			/// draw mesh brush left
 			DrawGpuMesh2(this->meshBrushLeft.mMesh, Matrix44(this->toolLeft.matrixBrush), Vec4(myColors[this->toolLeft.emitter.typeMaterial]));
 		}
 		if (this->toolRight.toolEmitter) {
-			/// draw mesh tool
-			DrawGpuMesh(this->meshToolRight, Matrix44(this->toolRight.matrixTool), Vec3(myColors[5]));
-			//DrawGpuMesh(this->meshToolRight.mMesh, Matrix44::kIdentity, Vec3(myColors[5]));
-
-			/// draw mesh brush
+			/// draw mesh brush right
 			DrawGpuMesh2(this->meshBrushRight.mMesh, Matrix44(this->toolRight.matrixBrush), Vec4(myColors[this->toolRight.emitter.typeMaterial]));
 		}
 		/// draw future particles
@@ -1339,50 +1310,11 @@ public:
 	}
 
 	void keyDown(int key) {
-		if (!this->toolRight.handModel || !this->toolRight.handModel->unable)
-			return;
-		//std::cout<<"NOSE " << key << endl;
-		switch (key) {
-		case ' ': {
-			this->toolRight.isEmitter = !this->toolRight.isEmitter;
-			break;
-		}
-							/// change brush
-		case 39: {
-			this->toolRight.emitter.formBrush = (++this->toolRight.emitter.formBrush + FormBrushMax) % FormBrushMax;
-			(*this->tranformation[this->toolRight.emitter.formBrush])(&this->meshBrushRight, this->container.radius, this->toolRight.emitter.width);
-			break;
-		}
-						 /// change material
-		case 91: {
-			this->toolRight.emitter.typeMaterial = ++this->toolRight.emitter.typeMaterial % TypeMaterialMax;
-			(*this->tranformation[this->toolRight.emitter.formBrush])(&this->meshBrushRight, this->container.radius, this->toolRight.emitter.width);
-			break;
-		}
-		case 92: {
-			this->toolRight.emitter.width -= 2;
-			this->toolRight.emitter.width = this->toolRight.emitter.width < 0 ? 1 : this->toolRight.emitter.width;
-
-			(*this->tranformation[this->toolRight.emitter.formBrush])(&this->meshBrushRight, this->container.radius, this->toolRight.emitter.width);
-			break;
-		}
-		case 93: {
-			this->toolRight.emitter.width += 2;
-			this->toolRight.emitter.width = this->toolRight.emitter.width > WidthMax ? WidthMax : this->toolRight.emitter.width;
-
-			(*this->tranformation[this->toolRight.emitter.formBrush])(&this->meshBrushRight, this->container.radius, this->toolRight.emitter.width);
-
-			break;
-		}
-
-		default:
-			break;
-		}
+		this->toolRight.eventKeyDown(key);
 	}
 
 	void keyUp(int key) {
-		if (!this->toolRight.handModel || !this->toolRight.handModel->unable)
-			return;
+		this->toolRight.eventKeyUp(key);
 	}
 	int idObjectSelect = -1;
 	std::vector<Vec3> posObjectSelect;

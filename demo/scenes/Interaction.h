@@ -25,10 +25,8 @@ public:
 
 		/// Interaction
 		if(!vrcontrol){
-			vrcontrol = VRControl::createControl(2, &handleInputCallback, scale, centerContainer);
-
-			/// Interaction
-			vrcontrol->setupHMD(&createFrameCallback, &destroyFrameCallback, &drawFrameCallback);			
+			vrcontrol = VRControl::createControl(1, &handleInputCallback, scale, centerContainer);
+			vrcontrol->setupHMD(&createFrameCallback, &destroyFrameCallback, &drawFrameCallback);
 		}
 
 		// no fluids or sdf based collision
@@ -101,8 +99,8 @@ public:
 		this->numParticlesContainer = (DIM - 1) * 4;
 
 
-		this->tool.start(true, true, false, false);
-		this->tool.init(g_params.fluidRestDistance, centerContainer);
+		this->tool.start(true, true, true, false);
+		this->tool.initEmitter(g_params.fluidRestDistance, centerContainer,true, true);
 		
 		InitParticlesContainer();
 

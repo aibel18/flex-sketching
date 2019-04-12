@@ -146,7 +146,7 @@ ToolModel::ToolModel(){
 
 ToolModel::~ToolModel(){
 }
-bool ToolModel::bindHand(TypeHand type, VRControl *vrcontrol, ContainerModel *container) {
+bool ToolModel::bindHand(TypeHand type, VRControl *vrcontrol, ContainerModel *container, int particleIndex, bool isHand) {
 	
 	this->handModel = &vrcontrol->hand[type];
 	this->controlModel = &vrcontrol->con[type];
@@ -155,25 +155,31 @@ bool ToolModel::bindHand(TypeHand type, VRControl *vrcontrol, ContainerModel *co
 	this->handModel->type = type;
 
 
-	//*//////////////
-	///load particles tool
-	std::ifstream file("../../data/controller.objx");	
+	if (!isHand) {
+		//*//////////////
+		///load particles tool
+		std::ifstream file("../../data/controller.objx");
 
-	file >> this->numberParticles;
-	float x,y,z;
-	for (int i=0;i< this->numberParticles;i++) {
-		file >> x >> y >> z;
-		//std::cout << x << " " << y << " " << z << std::endl;
-		this->particles.push_back( vec3(x,y,z));
+		file >> this->numberParticles;
+		float x, y, z;
+		for (int i = 0; i < this->numberParticles; i++) {
+			file >> x >> y >> z;
+			//std::cout << x << " " << y << " " << z << std::endl;
+			this->particles.push_back(vec3(x, y, z));
+		}
+		file.close();
+		//////////////*/
 	}
-	std::cout << "number particles tool: " << this->numberParticles << std::endl;
-	file.close();
-	//////////////*/
+
+	this->offsetParticles = particleIndex;
+	this->handModel->init(particleIndex, isHand);
+
+	std::cout << "ToolModel " << ( type?"RIGHT":"LEFT" )  <<" : #particles : " << (this->numberParticles ? this->numberParticles : this->handModel->sizeParticlesHand) << std::endl;
 
 	return true;
 }
 
-void ToolModel::init(bool toolEmitter) {
+void ToolModel::initEmitter(bool toolEmitter) {
 	this->isEmitter = false;
 	this->toolEmitter = toolEmitter;
 
@@ -299,6 +305,94 @@ void ToolModel::eventControllerJoystick() {
 	if (joystickActive) {
 
 	}
+}
+
+void ToolModel::eventKeyDown(int key) {
+	if (!this->handModel || !this->handModel->unable)
+		return;
+
+	switch (key) {
+		case ' ': {
+			this->isEmitter = true;
+			break;
+		}
+	/// change form brush
+		case 39: {
+			this->emitter.formBrush = (++this->emitter.formBrush + FormBrushMax) % FormBrushMax;
+			joystickActive = true;
+			break;
+		}
+		/// change material
+		case 91: {
+			this->emitter.typeMaterial = ++this->emitter.typeMaterial % TypeMaterialMax;
+			break;
+		}
+		/// change width brush
+		case 92: {
+
+			this->emitter.width -= 2;
+			this->emitter.width = this->emitter.width < 0 ? 1 : this->emitter.width;
+			joystickActive = true;
+			break;
+		}
+		/// change width brush
+		case 93: {
+			this->emitter.width += 2;
+			this->emitter.width = this->emitter.width > WidthMax ? WidthMax : this->emitter.width;
+			joystickActive = true;
+			break;
+		}
+		case '/': {
+			this->isEmitter = false;
+			if (this->container->numberNewparticles > 0) {
+				this->container->newObject = true;
+
+				/// REVIEW
+				this->emitter.typeMaterial = this->emitter.typeMaterialLast;
+				this->container->typeMaterialTemp = this->emitter.typeMaterial;
+			}
+
+			break;
+		}
+		case ',': {
+			this->isGrasp = true;
+			break;
+		}
+		default:
+			break;
+	}
+	
+
+}
+
+void ToolModel::eventKeyUp(int key) {
+
+	if (!this->handModel || !this->handModel->unable)
+		return;
+
+	switch (key) {
+		case ' ': {
+			this->isEmitter = false;
+			break;
+		}
+		case 39: {
+			joystickActive = false;
+			break;
+		}
+		case 92: {
+			joystickActive = false;
+			break;
+		}
+		case 93: {
+			joystickActive = false;
+			break;
+		}
+		case ',': {
+			this->isGrasp = false;
+			break;
+		}
+	}
+
 }
 
 bool ToolModel::update() {

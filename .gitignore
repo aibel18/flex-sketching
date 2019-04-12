@@ -11,3 +11,8 @@
 # /demo/compiler/vc14win64/* 
 # /extensions/compiler/vc14win64/* 
 /doc/*
+
+/bin/win64/NvFlexDemoRealseCuda_x64.exe.pdb
+/bin/win64/flexDemoCUDA.iobj
+/bin/win64/flexDemoCUDA.ipdb
+/bin/win64/flexDemoCUDA.exe
