@@ -603,6 +603,7 @@ void main()
 	else
 	{
 		gl_TexCoord[3].xyz = mix(colors[phase % 8].xyz*2.0, vec3(1.0), 0.1);
+		gl_TexCoord[3].w = colors[phase % 8].w;
 	}
 
 	gl_TexCoord[4].xyz = gl_Vertex.xyz;
@@ -678,7 +679,7 @@ void main()
 	
 	vec3 Lo = diffuse*reflectance*max(0.0, sqr(-dot(gl_TexCoord[2].xyz, normal)*0.5 + 0.5))*max(0.2,shadow)*attenuation;
 
-	gl_FragColor = vec4(pow(Lo, vec3(1.0/2.2)), 1.0);
+	gl_FragColor = vec4(pow(Lo, vec3(1.0/2.2)), gl_TexCoord[3].w);
 
 	vec3 eyePos = gl_TexCoord[5].xyz + normal*pointRadius;//*2.0;
 	vec4 ndcPos = gl_ProjectionMatrix * vec4(eyePos, 1.0);
@@ -995,6 +996,8 @@ void drawPoints(unsigned int idVBO, unsigned int indicesVBO, int n, int offset, 
 		//glDepthMask(GL_TRUE);
 		glEnable(GL_DEPTH_TEST);
 
+		glEnable(GL_BLEND);
+
 		int mode = 0;
 		/*if (showDensity)
 			mode = 1;*/
@@ -1050,6 +1053,8 @@ void drawPoints(unsigned int idVBO, unsigned int indicesVBO, int n, int offset, 
 
 		glDisable(GL_POINT_SPRITE);
 		glDisable(GL_VERTEX_PROGRAM_POINT_SIZE);
+
+		glDisable(GL_BLEND);
 	}
 }
 
@@ -3369,18 +3374,22 @@ void DrawGpuMesh2(GpuMesh* m, const Matrix44& xform, const Vec4& color)
 {
 	if (m)
 	{
-		//glEnable(GL_BLEND);
-		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		GLint program;
 		glGetIntegerv(GL_CURRENT_PROGRAM, &program);
+
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		if (program)
 			glUniformMatrix4fv(glGetUniformLocation(program, "objectTransform"), 1, false, xform);
 
 		
-		//glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-		glVerify(glColor4fv(color));
+					
+		//glVerify(glColor4fv(color));
+		glColor4f(0.81, 0.71, 0.51, 0.1f);
+
 		//glVerify(glSecondaryColorv(color));
 		//glVerify(glColor4fv(color));
 
@@ -3404,8 +3413,10 @@ void DrawGpuMesh2(GpuMesh* m, const Matrix44& xform, const Vec4& color)
 		glVerify(glBindBuffer(GL_ARRAY_BUFFER, 0));
 
 		if (program)
-			glUniformMatrix4fv(glGetUniformLocation(program, "objectTransform"), 1, false, Matrix44::kIdentity);
-		//glDisable(GL_BLEND);
+			glUniformMatrix4fv(glGetUniformLocation(program, "objectTransform"), 1, false, Matrix44::kIdentity);	
+
+
+		glDisable(GL_BLEND);
 	}
 }
 

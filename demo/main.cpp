@@ -178,7 +178,7 @@ bool g_shapesChanged = false;
 /* Note that this array of colors is altered by demo code, and is also read from global by graphics API impls */
 Colour g_colors[] =
 {
-	Colour(0.797f, 0.354f, 0.000f),
+	Colour(0.797f, 0.354f, 0.000f,0.1f),
 	Colour(0.092f, 0.465f, 0.820f),
 	Colour(0.000f, 0.349f, 0.173f),
 	Colour(0.875f, 0.782f, 0.051f),
@@ -195,9 +195,9 @@ Colour myColors[] =
 	Colour(0.797f, 0.354f, 0.000f,0.1f),
 	Colour(0.092f, 0.465f, 0.820f,0.1f),
 
-	Colour(236.0f / 255, 239.0f / 255, 241.0f / 255/*, 0.8f*/),
+	Colour(236.0f / 255, 239.0f / 255, 241.0f / 255, 1.0f),
 	
-	Colour(100.0f / 255, 221.0f / 255, 23.0f / 255/*, 0.8f*/),
+	Colour(100.0f / 255, 221.0f / 255, 23.0f / 255, 0.75f),
 	Colour(55.0f / 255, 71.0f / 255, 79.0f / 255/*, 0.8f*/),
 
 	Colour(198.0f / 255, 255.0f / 255, 0.0f / 255/*, 0.8f*/),
@@ -1562,14 +1562,15 @@ void RenderScene()
 
 
 	// first pass of diffuse particles (behind fluid surface)
-	if (g_drawDiffuse)
-		RenderDiffuse(g_fluidRenderer, g_diffuseRenderBuffers, numDiffuse, radius*g_diffuseScale, float(g_screenWidth), aspect, fov, g_diffuseColor, g_lightPos, g_lightTarget, lightTransform, g_shadowMap, g_diffuseMotionScale, g_diffuseInscatter, g_diffuseOutscatter, g_diffuseShadow, false);
+	//if (g_drawDiffuse)
+		//RenderDiffuse(g_fluidRenderer, g_diffuseRenderBuffers, numDiffuse, radius*g_diffuseScale, float(g_screenWidth), aspect, fov, g_diffuseColor, g_lightPos, g_lightTarget, lightTransform, g_shadowMap, g_diffuseMotionScale, g_diffuseInscatter, g_diffuseOutscatter, g_diffuseShadow, false);
 
 	if (g_drawEllipsoids)
 	{
 		// draw solid particles separately
 		if (g_numSolidParticles && g_drawPoints)
 			DrawPoints(g_fluidRenderBuffers, g_numSolidParticles, 0, radius, float(g_screenWidth), aspect, fov, g_lightPos, g_lightTarget, lightTransform, g_shadowMap, g_drawDensity);
+
 
 		// render fluid surface
 		RenderEllipsoids(g_fluidRenderer, g_fluidRenderBuffers, numParticles - g_numSolidParticles, g_numSolidParticles, radius, float(g_screenWidth), aspect, fov, g_lightPos, g_lightTarget, lightTransform, g_shadowMap, g_fluidColor, g_blur, g_ior, g_drawOpaque);
@@ -3168,6 +3169,7 @@ int main(int argc, char* argv[])
 	}
 	
 	// opening scene
+	g_scenes.push_back(new Task1("Task1"));
 	g_scenes.push_back(new Interaction("Interaction"));
 
 	//g_scenes.push_back(new PotPourri("Pot Pourri"));

@@ -985,26 +985,29 @@ public:
 				Matrix44 xform = TranslationMatrix(Point3(g_buffers->rigidTranslations[indexSolid]))*RotationMatrix(Quat(g_buffers->rigidRotations[indexSolid]));
 				
 				DrawGpuMesh(this->objects[i].mGpuMesh, xform, this->objects[i].mColor);
-				//DrawGpuMesh(this->objects[i].mGpuMesh, Matrix44::kIdentity, this->objects[i].mColor);
-				
+				//DrawGpuMesh(this->objects[i].mGpuMesh, Matrix44::kIdentity, this->objects[i].mColor);				
 			}
 			else if (this->objects[i].type == 1) {
 				this->drawSoft(this->objects[i]);
 			}
-			
+			else {				
+				//RenderEllipsoids(g_fluidRenderer, g_fluidRenderBuffers, this->objects[i].particles - this->objects[i].particlesOffset, this->objects[i].particlesOffset, radius, float(g_screenWidth), aspect, fov, g_lightPos, g_lightTarget, lightTransform, g_shadowMap, g_fluidColor, g_blur, g_ior, g_drawOpaque);
+			}
 		}
-		
-		if ( this->toolLeft.numberParticles ) {
-			/// draw mesh tool left
+		/// draw mesh tool left
+		if ( this->toolLeft.numberParticles ) {			
 			DrawGpuMesh(this->meshToolLeft, Matrix44(this->toolLeft.matrixTool), Vec3(myColors[5]));
-		}		
-		if ( this->toolRight.numberParticles) {
-			/// draw mesh tool right
+		}	
+		/// draw mesh tool right
+		if ( this->toolRight.numberParticles) {			
 			DrawGpuMesh(this->meshToolRight, Matrix44(this->toolRight.matrixTool), Vec3(myColors[5]));
 		}
-		if (this->toolLeft.toolEmitter) {
-			/// draw mesh brush left
+		/// draw mesh brush left
+		if (this->toolLeft.toolEmitter) {			
 			DrawGpuMesh2(this->meshBrushLeft.mMesh, Matrix44(this->toolLeft.matrixBrush), Vec4(myColors[this->toolLeft.emitter.typeMaterial]));
+		}
+		else {
+			//DrawRect(this->toolLeft.matrixTool[12], this->toolLeft.matrixTool[13], this->toolLeft.matrixTool[14], 1.0f,Vec3(0.5f, 0.5f, 0.5f));
 		}
 		if (this->toolRight.toolEmitter) {
 			/// draw mesh brush right
