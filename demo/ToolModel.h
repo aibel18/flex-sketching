@@ -343,8 +343,9 @@ struct EmitterModel
 ------------------------------------------------------------------------------------
 */
 /// Maximun Val
-constexpr int WidthMax = 61;
-constexpr int FormBrushMax = 6;
+constexpr int WidthMax = 11;//61;
+constexpr int WidthMin = 3;//61;
+constexpr int FormBrushMax = 3;
 constexpr int TypeMaterialMax = 4;
 
 class ToolModel

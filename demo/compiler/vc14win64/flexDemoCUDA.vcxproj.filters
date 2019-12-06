@@ -198,6 +198,9 @@
     <ClInclude Include="..\..\ToolModel.h">
       <Filter>demo</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\scenes\Task1.h">
+      <Filter>demo\scenes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\imgui.cpp">

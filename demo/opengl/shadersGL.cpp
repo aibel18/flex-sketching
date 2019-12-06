@@ -1626,7 +1626,7 @@ void main()
 	gl_Position = gl_ModelViewProjectionMatrix * vec4(gl_Vertex.xyz, 1.0);
 	gl_PointSize = pointScale * (pointRadius / gl_Position.w);
 
-	gl_TexCoord[0] = gl_MultiTexCoord0;    
+	gl_TexCoord[0] = gl_MultiTexCoord0;
 	gl_TexCoord[1] = gl_ModelViewMatrix * vec4(gl_Vertex.xyz, 1.0);
 }
 );
@@ -2739,7 +2739,7 @@ void RenderEllipsoids(FluidRenderer* render, FluidRenderBuffers* buffersIn, int 
 }
 
 
-void RenderEllipsoidsOculus(FluidRenderer* render, FluidRenderBuffers* buffersIn, int n, int offset, float radius, float screenWidth, float screenAspect, float fov, Vec3 lightPos, Vec3 lightTarget, Matrix44 lightTransform, ShadowMap* shadowMap, Vec4 color, float blur, float ior, bool debug, int idFbo,int w, int h)
+void RenderEllipsoidsOculus(FluidRenderer* render, FluidRenderBuffers* buffersIn, int n, int offset, float radius, float screenWidth, float screenAspect, float fov, Vec3 lightPos, Vec3 lightTarget, Matrix44 lightTransform, ShadowMap* shadowMap, Vec4 color, float blur, float ior, bool debug, int idFbo,int w, int h, Matrix44 view, Matrix44 proj)
 {
 	FluidRenderBuffersGL* buffers = reinterpret_cast<FluidRenderBuffersGL*>(buffersIn);
 
@@ -3387,8 +3387,8 @@ void DrawGpuMesh2(GpuMesh* m, const Matrix44& xform, const Vec4& color)
 
 		
 					
-		//glVerify(glColor4fv(color));
-		glColor4f(0.81, 0.71, 0.51, 0.1f);
+		glVerify(glColor4fv(color));
+		//glColor4f(0.81, 0.71, 0.51, 0.1f);
 
 		//glVerify(glSecondaryColorv(color));
 		//glVerify(glColor4fv(color));
@@ -3602,9 +3602,9 @@ void DemoContextOGL::renderEllipsoids(FluidRenderer* renderer, FluidRenderBuffer
 {
 	OGL_Renderer::RenderEllipsoids(renderer, buffers, n, offset, radius, screenWidth, screenAspect, fov, lightPos, lightTarget, lightTransform, shadowMap, color, blur, ior, debug);
 }
-void DemoContextOGL::renderEllipsoidsOculus(FluidRenderer* renderer, FluidRenderBuffers* buffers, int n, int offset, float radius, float screenWidth, float screenAspect, float fov, Vec3 lightPos, Vec3 lightTarget, Matrix44 lightTransform, ::ShadowMap* shadowMap, Vec4 color, float blur, float ior, bool debug, int idFbo, int w, int h)
+void DemoContextOGL::renderEllipsoidsOculus(FluidRenderer* renderer, FluidRenderBuffers* buffers, int n, int offset, float radius, float screenWidth, float screenAspect, float fov, Vec3 lightPos, Vec3 lightTarget, Matrix44 lightTransform, ::ShadowMap* shadowMap, Vec4 color, float blur, float ior, bool debug, int idFbo, int w, int h, Matrix44 view, Matrix44 proj)
 {
-	OGL_Renderer::RenderEllipsoidsOculus(renderer, buffers, n, offset, radius, screenWidth, screenAspect, fov, lightPos, lightTarget, lightTransform, shadowMap, color, blur, ior, debug, idFbo, w, h);
+	OGL_Renderer::RenderEllipsoidsOculus(renderer, buffers, n, offset, radius, screenWidth, screenAspect, fov, lightPos, lightTarget, lightTransform, shadowMap, color, blur, ior, debug, idFbo, w, h, view, proj);
 }
 
 

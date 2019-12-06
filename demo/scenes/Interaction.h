@@ -15,7 +15,7 @@ public:
 	float centerContainer[3] = { 0.0f,0.0f, 0.0f };
 	//float centerContainer[3] = { 0.0f,-2.0f, 0.0f };
 
-	float radius = 0.1875;//0.1875f;// 0.1f;
+	float radius = 0.25f;//0.1875f;// 0.1f;
 	float restDistanceFluid = radius * 0.65f;//0.55f;
 	float restDistanceSolid = radius * 0.6f;//0.55f;
 	
@@ -25,7 +25,7 @@ public:
 
 		/// Interaction
 		if(!vrcontrol){
-			vrcontrol = VRControl::createControl(1, &handleInputCallback, scale, centerContainer);
+			vrcontrol = VRControl::createControl(2, &handleInputCallback, scale, centerContainer);
 			vrcontrol->setupHMD(&createFrameCallback, &destroyFrameCallback, &drawFrameCallback);
 		}
 
@@ -54,6 +54,26 @@ public:
 		g_params.solidPressure = 0.0f;
 		g_params.smoothing = 1.0f;
 		g_params.relaxationFactor = 1.0f;
+
+
+		// falling objects
+		/*Vec3 lower, upper;
+		GetParticleBounds(lower, upper);
+
+		Vec3 center(0.0f);
+		center.y = 0.0f;
+
+		float width = (upper - lower).x*0.5f;
+		float edge = 0.125f;
+		float height = 0.5f;
+
+
+		AddBox(Vec3(edge, height, width + edge * 2.0f), center + Vec3(-width - edge, height / 2.0f, 0.0f));
+		AddBox(Vec3(edge, height, width + edge * 2.0f), center + Vec3(width + edge, height / 2.0f, 0.0f));
+
+		AddBox(Vec3(width + 2.0f*edge, height, edge), center + Vec3(0.0f, height / 2.0f, -(width + edge)));
+		AddBox(Vec3(width + 2.0f*edge, height, edge), center + Vec3(0.0f, height / 2.0f, width + edge));*/
+
 
 		//g_params.restitution = 0.001f;
 				
@@ -100,7 +120,7 @@ public:
 
 
 		this->tool.start(false, true, false, false);
-		this->tool.initEmitter(g_params.fluidRestDistance, centerContainer,false, true);
+		this->tool.initEmitter(g_params.fluidRestDistance, centerContainer,true, true);
 		
 		InitParticlesContainer();
 

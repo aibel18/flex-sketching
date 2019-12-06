@@ -868,7 +868,7 @@ void DemoContextD3D12::renderEllipsoids(FluidRenderer* renderer, FluidRenderBuff
 	}
 }
 
-void DemoContextD3D12::renderEllipsoidsOculus(FluidRenderer* renderer, FluidRenderBuffers* buffersIn, int n, int offset, float radius, float screenWidth, float screenAspect, float fov, FlexVec3 lightPos, FlexVec3 lightTarget, Matrix44 lightTransform, ::ShadowMap* shadowMap, FlexVec4 color, float blur, float ior, bool debug, int idFBO, int w, int h)
+void DemoContextD3D12::renderEllipsoidsOculus(FluidRenderer* renderer, FluidRenderBuffers* buffersIn, int n, int offset, float radius, float screenWidth, float screenAspect, float fov, FlexVec3 lightPos, FlexVec3 lightTarget, Matrix44 lightTransform, ::ShadowMap* shadowMap, FlexVec4 color, float blur, float ior, bool debug, int idFBO, int w, int h, Matrix44 view, Matrix44 proj)
 {
 	FluidRenderBuffersD3D12& buffers = *reinterpret_cast<FluidRenderBuffersD3D12*>(buffersIn);
 	if (n == 0)

@@ -25,7 +25,7 @@ public:
 	virtual void setView(Matrix44 view, Matrix44 projection);
 	virtual void renderEllipsoids(FluidRenderer* renderer, FluidRenderBuffers* buffers, int n, int offset, float radius, float screenWidth, float screenAspect, float fov, Vec3 lightPos, Vec3 lightTarget, Matrix44 lightTransform, ::ShadowMap* shadowMap, Vec4 color, float blur, float ior, bool debug);
 	/// interaction
-	virtual void renderEllipsoidsOculus(FluidRenderer* render, FluidRenderBuffers* buffers, int n, int offset, float radius, float screenWidth, float screenAspect, float fov, Vec3 lightPos, Vec3 lightTarget, Matrix44 lightTransform, ShadowMap* shadowTex, Vec4 color, float blur, float ior, bool debug, int idFBO, int w, int h);
+	virtual void renderEllipsoidsOculus(FluidRenderer* render, FluidRenderBuffers* buffers, int n, int offset, float radius, float screenWidth, float screenAspect, float fov, Vec3 lightPos, Vec3 lightTarget, Matrix44 lightTransform, ShadowMap* shadowTex, Vec4 color, float blur, float ior, bool debug, int idFBO, int w, int h, Matrix44 view, Matrix44 proj);
 	virtual void drawMesh(const Mesh* m, Vec3 color);
 	virtual void drawCloth(const Vec4* positions, const Vec4* normals, const float* uvs, const int* indices, int numTris, int numPositions, int colorIndex, float expand, bool twosided, bool smooth);
 	virtual void drawRope(Vec4* positions, int* indices, int numIndices, float radius, int color);

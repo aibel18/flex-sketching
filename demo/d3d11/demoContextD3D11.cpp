@@ -1122,7 +1122,7 @@ void DemoContextD3D11::renderEllipsoids(FluidRenderer* rendererIn, FluidRenderBu
 	deviceContext->OMSetBlendState(nullptr, 0, 0xffff);
 }
 
-void DemoContextD3D11::renderEllipsoidsOculus(FluidRenderer* rendererIn, FluidRenderBuffers* buffersIn, int n, int offset, float radius, float screenWidth, float screenAspect, float fov, Vec3 lightPos, Vec3 lightTarget, Matrix44 lightTransform, ShadowMap* shadowMap, Vec4 color, float blur, float ior, bool debug, int idFBO, int w, int h)
+void DemoContextD3D11::renderEllipsoidsOculus(FluidRenderer* rendererIn, FluidRenderBuffers* buffersIn, int n, int offset, float radius, float screenWidth, float screenAspect, float fov, Vec3 lightPos, Vec3 lightTarget, Matrix44 lightTransform, ShadowMap* shadowMap, Vec4 color, float blur, float ior, bool debug, int idFBO, int w, int h, Matrix44 view, Matrix44 proj)
 {
 	FluidRenderBuffersD3D11& buffers = *reinterpret_cast<FluidRenderBuffersD3D11*>(buffersIn);
 	FluidRendererD3D11& renderer = *(FluidRendererD3D11*)rendererIn;

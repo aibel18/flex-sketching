@@ -1015,7 +1015,7 @@ public:
 		}
 		/// draw future particles
 		if (this->container.activeParticles > 0 ) {
-			drawPoints(this->container.idVBO, this->container.indicesVBO, this->container.numberNewparticles, 0, radius, float(g_screenWidth), aspect, fov, g_lightPos, g_lightTarget, lightTransform, g_shadowMap);
+			drawPoints(this->container.idVBO, this->container.indicesVBO, this->container.numberNewparticles, 0, radius*0.68f, float(g_screenWidth), aspect, fov, g_lightPos, g_lightTarget, lightTransform, g_shadowMap);
 		}
 	}
 	
@@ -1412,9 +1412,10 @@ public:
 				this->selectObject(idObjectSelect);
 		}*/
 
-		if ( (isCollitionLeft || isCollitionRight) && idObjectSelect < 0) {
+		if ( (isCollitionLeft || isCollitionRight) /*&& idObjectSelect < 0*/) {
 			//idObjectSelect = getIdObject(phaseObject) - this->numberHand;
 			vrcontrol->haptic(isCollitionLeft, isCollitionRight);
+			//std::cout<< "VIBRATIONS";
 		}
 		/*
 		else if (idObjectSelect>=0 && !this->toolLeft.isGrasp && !this->toolRight.isGrasp ) {

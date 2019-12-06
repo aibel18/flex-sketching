@@ -24,15 +24,17 @@ VRControl::VRControl() {
 VRControl::~VRControl() {
 }
 
-VRControl* VRControl::createControl(int device, void(*managerEvent)(vr::VREvent_t event),float scale, float center[3]) {
+VRControl* VRControl::createControl(int device, void(*managerEvent)(vr::VREvent_t event),float scale, float center[3]) {	
 
 	switch (device) {
 		case 1:{
-			return new LeapControl();
-			return 0;
+			LeapControl *leapControl = new LeapControl();
+			leapControl->device = device;
+			return leapControl;
 		}
 		case 2:{
 			OpenControl *oControl = new OpenControl();
+			oControl->device = device;
 			oControl->managerEvent = managerEvent;
 
 			//// calibration

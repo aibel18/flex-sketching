@@ -189,9 +189,9 @@ void RenderEllipsoids(FluidRenderer* renderer, FluidRenderBuffers* buffers, int 
 	s_context->renderEllipsoids(renderer, buffers, n, offset, radius, screenWidth, screenAspect, fov, lightPos, lightTarget, lightTransform, shadowMap, color, blur, ior, debug);
 }
 
-void RenderEllipsoidsOculus(FluidRenderer* renderer, FluidRenderBuffers* buffers, int n, int offset, float radius, float screenWidth, float screenAspect, float fov, Vec3 lightPos, Vec3 lightTarget, Matrix44 lightTransform, ShadowMap* shadowMap, Vec4 color, float blur, float ior, bool debug, int idFBO, int w, int h)
+void RenderEllipsoidsOculus(FluidRenderer* renderer, FluidRenderBuffers* buffers, int n, int offset, float radius, float screenWidth, float screenAspect, float fov, Vec3 lightPos, Vec3 lightTarget, Matrix44 lightTransform, ShadowMap* shadowMap, Vec4 color, float blur, float ior, bool debug, int idFBO, int w, int h, Matrix44 view, Matrix44 proj)
 {
-	s_context->renderEllipsoidsOculus(renderer, buffers, n, offset, radius, screenWidth, screenAspect, fov, lightPos, lightTarget, lightTransform, shadowMap, color, blur, ior, debug,idFBO, w, h);
+	s_context->renderEllipsoidsOculus(renderer, buffers, n, offset, radius, screenWidth, screenAspect, fov, lightPos, lightTarget, lightTransform, shadowMap, color, blur, ior, debug,idFBO, w, h, view, proj);
 }
 
 DiffuseRenderBuffers* CreateDiffuseRenderBuffers(int numDiffuseParticles, bool& enableInterop) { return s_context->createDiffuseRenderBuffers(numDiffuseParticles, enableInterop); }

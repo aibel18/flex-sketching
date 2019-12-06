@@ -64,7 +64,8 @@ public:
 										0.0f,0.0f,1.0f,0.0f,
 										0.0f,0.0f,0.0f,1.0f };
 
-	bool isHMD = false;
+	bool isHMD = false;	
+	int device;
 	int idHMD = -1;
 	bool unableHMD = false;
 

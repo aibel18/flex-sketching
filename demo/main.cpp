@@ -142,7 +142,7 @@ void drawFrameCallback(FrameBuffer *fbL, int w, int h);
 void destroyFrameCallback(FrameBuffer *fb);
 
 FluidRenderer* g_fluidRenderer;
-FluidRenderer* g_fluidRenderer2;
+FluidRenderer* g_fluidRendererOculus;
 FluidRenderBuffers* g_fluidRenderBuffers;
 DiffuseRenderBuffers* g_diffuseRenderBuffers;
 
@@ -197,7 +197,7 @@ Colour myColors[] =
 
 	Colour(236.0f / 255, 239.0f / 255, 241.0f / 255, 1.0f),
 	
-	Colour(100.0f / 255, 221.0f / 255, 23.0f / 255, 0.75f),
+	Colour(100.0f / 255, 221.0f / 255, 23.0f / 255, 0.8f),
 	Colour(55.0f / 255, 71.0f / 255, 79.0f / 255/*, 0.8f*/),
 
 	Colour(198.0f / 255, 255.0f / 255, 0.0f / 255/*, 0.8f*/),
@@ -1425,9 +1425,9 @@ void RenderScene()
 
 	Matrix44 proj = ProjectionMatrix(RadToDeg(fov), aspect, g_camNear, g_camFar);
 	Matrix44 view;
-	/*if( vrcontrol->isHMD )
-		view = Matrix44(vrcontrol->mHMDEye);
-	else*/
+	//if( vrcontrol->isHMD )
+		//view = Matrix44(vrcontrol->mHMDEye);
+	//else
 		view = RotationMatrix(-g_camAngle.x, Vec3(0.0f, 1.0f, 0.0f))*RotationMatrix(-g_camAngle.y, Vec3(cosf(-g_camAngle.x), 0.0f, sinf(-g_camAngle.x)))*TranslationMatrix(-Point3(g_camPos));
 
 	
@@ -1603,6 +1603,7 @@ void MyRenderScene(Matrix44 proj, Matrix44 view, int width, int height, int idFb
 
 	float fov = kPi / 4.0f;
 	float aspect = float(g_screenWidth) / g_screenHeight;
+	float aspect2 = float(width) / height;
 	//------------------------------------
 	
 	// radius used for drawing
@@ -1636,22 +1637,22 @@ void MyRenderScene(Matrix44 proj, Matrix44 view, int width, int height, int idFb
 
 	UnbindSolidShader();
 
-	/*
 	if (g_drawEllipsoids)
 	{
 		// draw solid particles separately
-		//if (g_numSolidParticles && g_drawPoints)
+		if (g_numSolidParticles && g_drawPoints)
 			DrawPoints(g_fluidRenderBuffers, g_numSolidParticles, 0, radius, float(g_screenWidth), aspect, fov, g_lightPos, g_lightTarget, lightTransform, g_shadowMap, g_drawDensity);
 
 		// render fluid surface
-		//SetView(view, proj);
-		//RenderEllipsoidsOculus(g_fluidRenderer, g_fluidRenderBuffers, numParticles - g_numSolidParticles, g_numSolidParticles, radius, float(g_screenWidth), aspect, fov, g_lightPos, g_lightTarget, lightTransform, g_shadowMap, g_fluidColor, g_blur, g_ior, g_drawOpaque, idFbo, width, height);
+		RenderEllipsoidsOculus(g_fluidRendererOculus, g_fluidRenderBuffers, numParticles - g_numSolidParticles, g_numSolidParticles, radius, float(width), aspect2, fov, g_lightPos, g_lightTarget, lightTransform, g_shadowMap, g_fluidColor, g_blur, g_ior, g_drawOpaque, idFbo, width, height, view, proj);
+
+		//RenderEllipsoids(g_fluidRenderer, g_fluidRenderBuffers, numParticles - g_numSolidParticles, g_numSolidParticles, radius, float(g_screenWidth), aspect, fov, g_lightPos, g_lightTarget, lightTransform, g_shadowMap, g_fluidColor, g_blur, g_ior, g_drawOpaque);
 
 		// second pass of diffuse particles for particles in front of fluid surface
-		if (g_drawDiffuse)
-			RenderDiffuse(g_fluidRenderer, g_diffuseRenderBuffers, numDiffuse, radius*g_diffuseScale, float(g_screenWidth), aspect, fov, g_diffuseColor, g_lightPos, g_lightTarget, lightTransform, g_shadowMap, g_diffuseMotionScale, g_diffuseInscatter, g_diffuseOutscatter, g_diffuseShadow, true);
+		/*if (g_drawDiffuse)
+			RenderDiffuse(g_fluidRenderer, g_diffuseRenderBuffers, numDiffuse, radius*g_diffuseScale, float(g_screenWidth), aspect, fov, g_diffuseColor, g_lightPos, g_lightTarget, lightTransform, g_shadowMap, g_diffuseMotionScale, g_diffuseInscatter, g_diffuseOutscatter, g_diffuseShadow, true);*/
 	}
-	else*/
+	else
 	{
 		// draw all particles as spheres
 		//if (g_drawPoints)
@@ -3169,7 +3170,7 @@ int main(int argc, char* argv[])
 	}
 	
 	// opening scene
-	g_scenes.push_back(new Task1("Task1"));
+	//g_scenes.push_back(new Task1("Task1"));
 	g_scenes.push_back(new Interaction("Interaction"));
 
 	//g_scenes.push_back(new PotPourri("Pot Pourri"));
@@ -3567,13 +3568,25 @@ int main(int argc, char* argv[])
 	// init default scene
 	StartGpuWork();
 	Init(g_scene);
-	EndGpuWork();	
+	EndGpuWork();
+	
+	/// Interaction -- rendering fluid for HMD
+	if (g_fluidRenderer) {
+		if (vrcontrol->device == 2) {
+			g_fluidRendererOculus = CreateFluidRenderer(vrcontrol->renderWidth, vrcontrol->renderHeight);			
+		}
+	}
 		
 
 	SDLMainLoop();
 
-	if (g_fluidRenderer)
+	if (g_fluidRenderer) {
+		if (vrcontrol->device == 2) {
+			DestroyFluidRenderer(g_fluidRendererOculus);
+		}
 		DestroyFluidRenderer(g_fluidRenderer);
+	}
+		
 
 	DestroyFluidRenderBuffers(g_fluidRenderBuffers);
 	DestroyDiffuseRenderBuffers(g_diffuseRenderBuffers);
